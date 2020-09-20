@@ -1,0 +1,12 @@
+{
+  "name": "scaledetector",
+  "version": "0.0.0",
+  "description": "Enter notes and detect scales, modes, and chord progressions",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Evan W. Isnor",
+  "license": "UNLICENSED",
+  "devDependencies": {}
+}
