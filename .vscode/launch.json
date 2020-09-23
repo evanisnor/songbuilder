@@ -4,11 +4,11 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Prototype",
+            "name": "Launch Prototype Alpha",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/prototype.js"
+            "program": "${workspaceFolder}/prototype/alpha.js"
         }
     ]
 }
