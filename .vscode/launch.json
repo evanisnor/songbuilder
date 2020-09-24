@@ -9,6 +9,15 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/prototype/alpha.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Prototype Beta",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/prototype/beta.js"
         }
     ]
 }
