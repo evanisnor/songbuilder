@@ -4,7 +4,7 @@
     Notes						
 
     Chromatic Ascending		A	A♯	B	C	C♯	D	D♯	E	F	F♯	G	G♯
-    Chromatic Descending	A	B♭	G	G♭	F	E	E♭	D	D♭	C	B	B♭
+    Chromatic Descending	A	B♭	B	C	D♭	D	E♭	E	F	G♭	G	A♭
 */
 
 const notesAscending = [

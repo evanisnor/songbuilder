@@ -19,5 +19,15 @@
             ],
             "program": "${workspaceFolder}/prototype/beta.js"
         }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Prototype Gamma",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/prototype/gamma/run.js"
+        }
     ]
 }
