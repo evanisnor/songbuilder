@@ -1,4 +1,6 @@
 
+// -NOTES----------------------------------------------------------------------
+
 class Note {
     constructor(tone, labelAscending, labelDescending) {
         this.tone = tone;
@@ -14,6 +16,10 @@ class Note {
             case 'descending':
                 return this.labelDescending;
         }
+    }
+
+    get codeFriendlyLabel() {
+        return this.labelAscending.replace('♯', 'Sharp').replace('♭', 'Flat')
     }
 
     toString() {
@@ -55,6 +61,8 @@ const Fsharp = Notes.Fsharp;
 const G = Notes.G;
 const Gsharp = Notes.Gsharp;
 
+// -MODES----------------------------------------------------------------------
+
 class Mode {
 
     constructor(name, offset) {
@@ -86,6 +94,24 @@ const Modes = {
     Locrian:        new Mode('Locrian', 6)
 }
 
+// -SCALES---------------------------------------------------------------------
+
+class ScalePattern {
+    constructor(name, intervals) {
+        this.name = name;
+        this.intervals = intervals;
+    }
+}
+
+const ScalePatterns = {
+    Major: new ScalePattern('Major', [ 2, 2, 1, 2, 2, 2, 1 ]),
+    HarmonicMinor: new ScalePattern('Harmonic Minor', [ 2, 1, 2, 2, 1, 3, 1 ]),
+    MelodicMinor: new ScalePattern('Melodic Minor', [ 2, 1, 2, 2, 2, 2, 1 ]),
+    MajorPentatonic: new ScalePattern('Major Pentatonic', [ 2, 2, 3, 2, 3 ]),
+    MinorPentatonic: new ScalePattern('Minor Pentatonic', [ 3, 2, 2, 3, 2 ]),
+    MajorPentatonicBlues: new ScalePattern('Major Pentatonic Blues', [ 2, 1, 1, 3, 2, 3 ]),
+    MinorPentatonicBlues: new ScalePattern('Minor Pentatonic Blues', [ 3, 2, 1, 1, 3, 2 ])
+}
 
 class Scale {
     constructor(name, notes, parent) {
@@ -102,7 +128,8 @@ class Scale {
         const chords = []
         for (let i = 0; i < args.length; i++) {
             const degree = args[i];
-            const chord = degree.chord(this.notes[degree.index])
+            const tonic = this.notes[degree.index]
+            const chord = degree.chord(tonic)
             chords.push(chord)
         }
         return new Progression(args, chords, this);
@@ -123,25 +150,29 @@ class Scale {
     }
 }
 
-const Scales = {
-    AMajor: new Scale('Major', [ A, B, Csharp, D, E, Fsharp, Gsharp ]),
-    ASharpMajor: new Scale('Major', [ Asharp, C, D, Dsharp, F, G, A ]),
-    BFlatMajor: new Scale('Major', [ Asharp, C, D, Dsharp, F, G, A ]),
-    BMajor: new Scale('Major', [ B, Csharp, Dsharp, E, Fsharp, Gsharp, Asharp ]),
-    CMajor: new Scale('Major', [ C, D, E, F, G, A, B ]),
-    CSharpMajor: new Scale('Major', [ Csharp, Dsharp, F, Fsharp, Gsharp, Asharp, C ]),
-    DFlatMajor: new Scale('Major', [ Csharp, Dsharp, F, Fsharp, Gsharp, Asharp, C ]),
-    DMajor: new Scale('Major', [ D, E, Fsharp, G, A, B, Csharp ]),
-    DSharpMajor: new Scale('Major', [ D, E, Fsharp, G, A, B, Csharp ]),
-    EFlatMajor: new Scale('Major', [ D, E, Fsharp, G, A, B, Csharp ]),
-    EMajor: new Scale('Major', [ E, Fsharp, Gsharp, A, B, Csharp, Dsharp ]),
-    FMajor: new Scale('Major', [ F, G, A, Asharp, C, D, E ]),
-    FSharpMajor: new Scale('Major', [ Fsharp, Gsharp, Asharp, B, Csharp, Dsharp, F ]),
-    GFlatMajor: new Scale('Major', [ Fsharp, Gsharp, Asharp, B, Csharp, Dsharp, F ]),
-    GMajor: new Scale('Major', [ G, A, B, C, D, E, Fsharp ]),
-    GSharpMajor: new Scale('Major', [ Gsharp, Asharp, C, Csharp, Dsharp, F, G ]),
-    AFlatMajor: new Scale('Major', [ Gsharp, Asharp, C, Csharp, Dsharp, F, G ])
+// Generate all of the scales
+const Scales = {}
+for (const i in ScalePatterns) {
+    if (ScalePatterns.hasOwnProperty(i)) {
+        const pattern = ScalePatterns[i];
+        
+        for (let n = 0; n < NotesArray.length; n++) {
+            const tonic = NotesArray[n];
+            const notes = [ tonic ];
+
+            var totalSteps = 0;
+            pattern.intervals.forEach(interval => {
+                totalSteps += interval;
+                notes.push(NotesArray[(tonic.tone + totalSteps) % NotesArray.length]);
+            });
+
+            const label = `${tonic.codeFriendlyLabel}${pattern.name.split(' ').join('')}`;
+            Scales[label] = new Scale(pattern.name, notes);
+        }
+    }
 }
+
+// -CHORDS---------------------------------------------------------------------
 
 class ChordType {
     constructor(symbol, semitones) {
@@ -180,6 +211,8 @@ class Chord {
         return `${this.tonic}${this.type.symbol} [${this.notes}]`
     }
 }
+
+// -PROGRESSIONS---------------------------------------------------------------
 
 class Progression {
     constructor(intervals, chords, parent) {
@@ -281,16 +314,16 @@ const VI = new Degree(5, 'VI');
 const VII = new Degree(6, 'VII');
 
 
-// Run
+// -RUN------------------------------------------------------------------------
 
 Object.values(Scales).forEach(scale => {
-    console.log(scale.toString())
-    console.log(scale.applyMode(Modes.Mixolydian).toString())
+    console.log(`${scale}`)
+    console.log(`${scale.applyMode(Modes.Mixolydian)}`)
     console.log('-----------')
 })
 
 
-console.log(Scales.CMajor.applyMode(Modes.Aeolian).progression(I.maj7(), IV, V, VII.dim()).toString())
+console.log(Scales.EMajor.applyMode(Modes.Dorian).progression(I.maj7(), IV, V, VII.dim()).toString())
 console.log('-----------')
 console.log(new Chord(C, ChordTypes.Major7th).toString());
 
